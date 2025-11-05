@@ -24,21 +24,21 @@ tasks:
           var: MODULES
         cmd: "{{.TF_BINARY}} fmt -recursive"
 
-  check-llm:
-    desc: Run concise plan optimized for machines / LLM
-    dir: "{{.USER_WORKING_DIR}}"
-    cmds:
-      - '{{.TF_BINARY}} init -json | grep -v ''"@level":"info"'' | { grep -v grep || true; }'
-      - "{{.TF_BINARY}} validate -json"
-      - |
-        {{.TF_BINARY}} plan -json | jq -cM '
-        if .type == "change_summary" or .type == "planned_change" then
-          del(."@timestamp", ."@level")
-        else
-          select(."@level" != "info")      # drop info lines of other types
-          | del(."@timestamp", ."@level")
-        end
-        '
+  # check-llm:
+  #   desc: Run concise plan optimized for machines / LLM
+  #   dir: "{{.USER_WORKING_DIR}}"
+  #   cmds:
+  #     - '{{.TF_BINARY}} init -json | grep -v ''"@level":"info"'' | { grep -v grep || true; }'
+  #     - "{{.TF_BINARY}} validate -json"
+  #     - |
+  #       {{.TF_BINARY}} plan -json | jq -cM '
+  #       if .type == "change_summary" or .type == "planned_change" then
+  #         del(."@timestamp", ."@level")
+  #       else
+  #         select(."@level" != "info")      # drop info lines of other types
+  #         | del(."@timestamp", ."@level")
+  #       end
+  #       '
 
   docs:
     desc: Generate docs for terraform modules
@@ -55,4 +55,4 @@ tasks:
     cmds:
       - for:
           var: MODULES_TEST
-        cmd: go test -v ./tests/{{.ITEM}}
+        cmd: cd tests/{{.ITEM}} && go test
